@@ -1,77 +1,42 @@
-import sys
-sys.path.append("..")
-from utils.decorator import token_required
-from flask import jsonify, request
-from flask_restful import Resource, Api , reqparse
-from werkzeug.security import generate_password_hash, check_password_hash
-import uuid
+from typing import Text
+from sqlalchemy import Column,String, DateTime, Boolean
+from app import database
+from models.dbtools import Dictable
+
+class User(object):
+    id = database.Column(String(32), primary_key=True)
+    username = database.Column(String(255))
+    password = database.Column(String(255))
+    jwt_token = database.Column(String(255))
+    last_login = database.Column(DateTime)
+    name_id = database.Column(String(255))
+    password_hash = database.Column(String(255))
+    team = database.Column(String(255))
+    api_token = database.Column(String(4000))
+    project = database.Column(String(255))
+    username_is_assigned = database.Column(Boolean)
+    authentication_mechanism = database.Column(String(255))
+
+    # def __init__(self, id, username, password, jwt_token, last_login, name_id, password_hash, team, api_token, project, username_is_assigned, authentication_mechanism):
+    #     self.id = id
+    #     self.username = username
+    #     self.password = password
+    #     self.jwt_token = jwt_token
+    #     self.last_login = last_login
+    #     self.name_id = name_id
+    #     self.password_hash = password_hash
+    #     self.team = team
+    #     self.api_token = api_token
+    #     self.project = project
+    #     self.username_is_assigned = username_is_assigned
+    #     self.authentication_mechanism = authentication_mechanism
+
+    def user_from_tuples(tuples):
+        user = User()
+        user.id , user.username, user.password, user.jwt_token, user.last_login, user.name_id, user.password_hash, user.team, user.api_token, user.project, user.username_is_assigned, user.authentication_mechanism = tuples
+        return user
 
 
-user_parser = reqparse.RequestParser()
-user_parser.add_argument('username', type=str, required=True)
-user_parser.add_argument('password', type=str, required=True)
 
-
-class User(Resource):
-    @app.route('/user')
-    @token_required
-    def get_all(current_user):
-        cur = mysql.connection.cursor()
-        cur.execute('''SELECT * FROM users''')
-        num_fields = len(cur.description)
-        field_names = [i[0] for i in cur.description]
-        rv = cur.fetchall()
-        cur.close()
-        re_list = []
-        for i in range(len(rv)):
-            result = dict(zip(field_names, rv[i]))
-            print(result)
-            re_list.append(result)
-        return jsonify(re_list)
-
-    @app.route('/user/<id>')
-    @token_required
-    def get_by_id(current_user, id):
-        cur = mysql.connection.cursor()
-        cur.execute('''SELECT * FROM users WHERE public_id = %s''', (id,))
-        rv = cur.fetchone()
-        num_fields = len(cur.description)
-        field_names = [i[0] for i in cur.description]
-        cur.close()
-        result = dict(zip(field_names, rv))
-        return jsonify (result)
-
-    @app.route('/user', methods=['POST'])
-    @token_required
-    def post(current_user):
-        user = user_parser.parse_args()
-        cur = mysql.connection.cursor()
-        cur.execute('''INSERT INTO users(username, password, public_id) VALUES(%s, %s, %s)''', (user['username'], generate_password_hash(user['password'], method='sha256'), str(uuid.uuid4())))
-        mysql.connection.commit()
-        cur.close()
-        return {'status': 'success'}
-
-    @app.route('/user/<id>', methods=['PUT'])
-    @token_required
-    def put(current_user,id):
-        user = user_parser.parse_args()
-        cur = mysql.connection.cursor()
-        cur.execute('''UPDATE users SET name = %s, password = %s WHERE public_id = %s''', (user['name'], generate_password_hash(user['password']), id))
-        mysql.connection.commit()
-        cur.execute('''SELECT * FROM users WHERE public_id = %s''', (id,))
-        rv = cur.fetchone()
-        num_fields = len(cur.description)
-        field_names = [i[0] for i in cur.description]
-        cur.close()
-        result = dict(zip(field_names, rv))
-        return jsonify (result) , 201
-        # return {'status': 'success'}
-
-    @app.route('/user/<id>', methods=['DELETE'])
-    @token_required
-    def delete(current_user,id):
-        cur = mysql.connection.cursor()
-        cur.execute('''DELETE FROM users WHERE public_id = %s''', (id,))
-        mysql.connection.commit()
-        cur.close()
-        return {'status': 'success'}
+    def __repr__(self):
+        return self.username

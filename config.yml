@@ -1,0 +1,4 @@
+mysql_host: '192.168.10.64'
+mysql_user: 'sanaul'
+mysql_password: 'sanaul123'
+mysql_database: 'chatbot'
