@@ -37,8 +37,10 @@ class User_controller(Resource):
         return jsonify(response)
 
     @app.route('/user', methods=['POST'])
-    @token_required
-    def create_user(current_user):
+    # @token_required
+    # def create_user(current_user):
+    def create_user():
         user = user_parser.parse_args()
         response = User_service.create(user)
-        return jsonify(response)
+        print(response)
+        return user,201

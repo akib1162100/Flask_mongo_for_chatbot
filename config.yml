@@ -1,4 +1,5 @@
-mysql_host: '192.168.10.64'
+mysql_host: '192.168.10.62'
 mysql_user: 'sanaul'
 mysql_password: 'sanaul123'
 mysql_database: 'chatbot'
+mongo_uri : 'mongodb://192.168.10.62:27017/rasa'
