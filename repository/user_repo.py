@@ -1,7 +1,5 @@
 from app import mysql , mongo
-from models.user import User
 from flask_mysqldb import MySQL
-from werkzeug.security import generate_password_hash
 
 
 def user_purse(field_names, values):
@@ -173,10 +171,13 @@ class User_mongo_repository():
 
     def get_by_username( username):
         cursor = mongo.db.users.find_one({"username":username})
+        print(cursor)
         if cursor:
-            return "Success",cursor,200
+            # return "Success",cursor,200
+            return cursor
         else:
-            return "Not Found",None,404
+            return None
+            # return "Not Found",None,404
     
     @staticmethod
     def create(id, username, password):
@@ -187,8 +188,6 @@ class User_mongo_repository():
             return "Created",user,201
         except Exception as e:
             return e,None,500
-        # finally:
-        #     cursor.close()
     
     @staticmethod
     def update(id,username, password):

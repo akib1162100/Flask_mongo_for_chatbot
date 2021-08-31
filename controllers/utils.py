@@ -9,19 +9,14 @@ def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = None
-
-        if 'x-access-token' in request.headers:
-            token = request.headers['x-access-token']
+        if 'X-Access-Tocken' in request.headers:
+            token = request.headers['X-Access-Tocken']
         if not token:
             return jsonify({'message': 'Token is missing'}), 401
 
         try:
-            print(token)
-            print()
             data = jwt.decode(token, app.config['SECRET_KEY'],algorithms=["HS256"])
-            print(data)
-            current_user = User_service.get_user_data(data['user_id'])
-            print(current_user)
+            current_user = User_service.get_user(data['user_id'])
 
         except:
             return jsonify({'message': 'Token is invalid'}), 401
